@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta name="theme-color" content="#7952b3">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <style>
+        .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+      .content{
+      	display: flex;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+    </style>
+</head>
+
+<body >
+    <header class="navbar navbar-dark bg-dark flex-md-nowrap p-0 shadow" style="height: 5vh;">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">管理系統</a>
+    </header>
+    <div style="height: 95vh;">
+        <div class="row" style="height: 100%;width: 100%;margin: 0;">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file"></span>
+                                打卡記錄查詢
+                            </a>
+                        </li>
+                </div>
+            </nav>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                	<ul class="d-flex" style="list-style: none;">
+                		<li><button onclick="myFunction(1)">地區A</button></li>
+                		<li><button onclick="myFunction(2)">地區B</button></li>
+                	</ul>
+                </div>
+                <div style="width: 100%;display: flex;">
+                	<div style="width: 100px">姓名</div>
+                	<div>打卡時間</div>
+                </div>
+                <div class="content flex flex-wrap" id="targetContent"></div>
+            </main>
+        </div>
+    </div>
+    <script>
+    function myFunction(locationId) {
+        let data = {
+            "action": "2",
+            "locationId": locationId,
+        }
+        $.ajax({
+            url: 'https://script.google.com/macros/s/AKfycbzNE-xc4o6qaZbmZIbXDKmnd2gG0HUv1OiV-uuQxcUg9j8oX-VHRtDl8xlHzt1VvO05-w/exec',
+            type: 'POST',
+            data: JSON.stringify(data),
+            success: function(result) {
+                let res = JSON.parse(result)
+                let targetContent = document.getElementById('targetContent')
+                targetContent.innerHTML = ''
+                let dataList = res[0].data
+                dataList.forEach(node=>{
+                    let cuTime = transTimeStamp(node.time)
+                	let liElement = document.createElement('div')
+                	liElement.style.width = '100vw'
+                	liElement.style.display = 'flex'
+                	liElement.innerHTML += `<div style="width: 100px">${node.name}</div> <div>${cuTime}</div>`;
+                	targetContent.appendChild(liElement)
+                })
+            },
+            error: function() {
+                console.error("error!");
+            },
+        })
+    }
+    function transTimeStamp(timestamp) {
+		const date = new Date(timestamp);
+
+		const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		const day = date.getDate();
+		const hours = date.getHours();
+		const minutes = date.getMinutes();
+		const seconds = date.getSeconds();
+
+		console.log(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+	}
+    </script>
+</body>
+</html>
